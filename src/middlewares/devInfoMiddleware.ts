@@ -81,12 +81,12 @@ const checkUniqueInfo = async (
 
   const queryString = `
   SELECT
-    "developerInfoID"
+    *
   FROM
     developers
   WHERE
-    "developerInfoID" = $1
-    `;
+    id = $1;
+`;
 
   const queryConfig: QueryConfig = {
     text: queryString,
@@ -95,12 +95,12 @@ const checkUniqueInfo = async (
 
   const queryResult: any = await client.query(queryConfig);
 
-  if (queryResult.rowCount === 0) {
-    return next();
-  } else {
+  if (queryResult.rows[0].developerInfoID) {
     res.status(400).json({
       message: "Developer info are already registered",
     });
+  } else {
+    return next();
   }
 };
 

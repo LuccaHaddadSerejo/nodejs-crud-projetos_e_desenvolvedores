@@ -37,7 +37,7 @@ const createDeveloperInfo = async (
   let queryString: string = format(
     `
       INSERT INTO 
-        developer_info (%I)
+        developers_info (%I)
       VALUES 
         (%L)
       RETURNING *;
@@ -52,9 +52,9 @@ const createDeveloperInfo = async (
   UPDATE
       developers
   SET
-      "devInfoId" = $1
+      "developerInfoID" = $1
   WHERE   
-      id = $2 
+      id = $2;
   `;
 
   const queryConfig: QueryConfig = {
