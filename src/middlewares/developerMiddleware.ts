@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { createdDeveloper } from "../@types/types";
+import { createdDev } from "../@types/types";
 import { QueryConfig } from "pg";
 import { client } from "../database";
 
@@ -27,7 +27,7 @@ const checkInvalidKeys = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const newBody: createdDeveloper = {
+  const newBody: createdDev = {
     name: req.body.name,
     email: req.body.email,
   };

@@ -1,16 +1,36 @@
 import { QueryResult } from "pg";
 
-interface iReqDeveloper {
+interface iReqDev {
   name: string;
   email: string;
   iDeveloperInfo?: number | null;
 }
 
-interface iDeveloper extends iReqDeveloper {
+interface iDev extends iReqDev {
   id: number;
 }
 
-type resDeveloper = QueryResult<iDeveloper>;
-type createdDeveloper = Omit<iDeveloper, "id">;
+type resDev = QueryResult<iDev>;
+type createdDev = Omit<iDev, "id">;
 
-export { iReqDeveloper, iDeveloper, resDeveloper, createdDeveloper };
+interface iReqDevInfo {
+  developerSince: Date;
+  preferredOS: "Windows" | "Linux" | "MacOS";
+}
+
+interface iDevInfo extends iReqDevInfo {
+  id: number;
+}
+
+type resDevInfo = QueryResult<iDevInfo>;
+type createdDevInfo = Omit<iDevInfo, "id">;
+
+export {
+  iReqDev,
+  iDev,
+  resDev,
+  createdDev,
+  iReqDevInfo,
+  resDevInfo,
+  createdDevInfo,
+};

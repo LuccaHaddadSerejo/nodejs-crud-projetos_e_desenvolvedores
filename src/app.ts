@@ -1,6 +1,6 @@
 import express, { Application } from "express";
 import { startDatabase } from "./database";
-import { createDeveloper } from "../src/logic/developer.logic";
+import { createDeveloper } from "./logic/developerLogic";
 import {
   checkInvalidKeys,
   checkRequiredKeys,
