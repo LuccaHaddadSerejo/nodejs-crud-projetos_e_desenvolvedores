@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import { QueryConfig } from "pg";
+import { Request, Response, text } from "express";
+import { QueryConfig, QueryParse } from "pg";
 import format from "pg-format";
 import { client } from "../database";
 import { resDev, resDevInfo } from "../@types/types";
@@ -8,8 +8,8 @@ const createDeveloper = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const dataKeys = Object.keys(req.developer.treatedBody);
-  const dataValues = Object.values(req.developer.treatedBody);
+  const dataKeys = Object.keys(req.developer.handledBody);
+  const dataValues = Object.values(req.developer.handledBody);
   const queryString: string = format(
     `
       INSERT INTO 
@@ -31,24 +31,40 @@ const createDeveloperInfo = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const dataKeys = Object.keys(req.developer.treatedBody);
-  const dataValues = Object.values(req.developer.treatedBody);
-  const queryString: string = format(
+  const devId: number = +req.params.id;
+  const dataKeys = Object.keys(req.info.handledDevInfo);
+  const dataValues = Object.values(req.info.handledDevInfo);
+  let queryString: string = format(
     `
       INSERT INTO 
         developer_info (%I)
       VALUES 
         (%L)
-      RETURNING 
-        *;
+      RETURNING *;
       `,
     dataKeys,
     dataValues
   );
 
-  const QueryResult: resDevInfo = await client.query(queryString);
+  const queryResult: any = await client.query(queryString);
 
-  return res.status(201).json({ QueryResult });
+  queryString = `
+  UPDATE
+      developers
+  SET
+      "devInfoId" = $1
+  WHERE   
+      id = $2 
+  `;
+
+  const queryConfig: QueryConfig = {
+    text: queryString,
+    values: [queryResult.rows[0].id, devId],
+  };
+
+  await client.query(queryConfig);
+
+  return res.status(201).json(queryResult.rows[0]);
 };
 
 export { createDeveloper, createDeveloperInfo };

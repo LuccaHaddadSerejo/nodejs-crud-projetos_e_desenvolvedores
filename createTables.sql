@@ -8,10 +8,10 @@ CREATE TABLE IF NOT EXISTS developers(
 	FOREIGN KEY ("developerInfoID") REFERENCES developer_info(id) 
 );
 	
-CREATE TABLE IF NOT EXISTS developers(
+CREATE TABLE IF NOT EXISTS developers_info(
 	"id" SERIAL PRIMARY KEY,
-	"name" VARCHAR(50) NOT NULL,
-	"email" VARCHAR(50) NOT NULL
+	"developerSince" DATE NOT NULL,
+	"preferredOS" osoption NOT NULL,
 );
 	
 CREATE TABLE IF NOT EXISTS projects_technologies(
@@ -29,15 +29,6 @@ CREATE TABLE IF NOT EXISTS projects(
 	"endDate" DATE NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS projects(
-	"id" SERIAL PRIMARY KEY,
-	"name" VARCHAR(50) NOT NULL,
-	"description" TEXT NOT NULL,
-	"estimatedTime" VARCHAR(20) NOT NULL,
-	"repository" VARCHAR(120) NOT NULL,
-	"startDate" DATE NOT NULL,
-	"endDate" DATE NOT NULL
-);
 
 CREATE TABLE IF NOT EXISTS technologies(
 	"id" SERIAL PRIMARY KEY,

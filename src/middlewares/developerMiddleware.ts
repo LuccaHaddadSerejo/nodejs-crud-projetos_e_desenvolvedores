@@ -33,9 +33,8 @@ const checkInvalidKeys = async (
   };
 
   req.developer = {
-    treatedBody: newBody,
+    handledBody: newBody,
   };
-
   return next();
 };
 
@@ -44,7 +43,7 @@ const checkUniqueEmail = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const getEmail = req.developer.treatedBody.email;
+  const getEmail = req.developer.handledBody.email;
 
   const queryString = `
   SELECT 

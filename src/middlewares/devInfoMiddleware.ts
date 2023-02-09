@@ -3,6 +3,38 @@ import { createdDevInfo } from "../@types/types";
 import { QueryConfig } from "pg";
 import { client } from "../database";
 
+const checkIfDeveloperExists = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const id = +req.params.id;
+
+  const queryString = `
+  SELECT
+    *
+  FROM
+    developers
+  WHERE 
+    id = $1;
+    `;
+
+  const queryConfig: QueryConfig = {
+    text: queryString,
+    values: [id],
+  };
+
+  const queryResult: any = await client.query(queryConfig);
+
+  if (queryResult.rowCount > 0) {
+    return next();
+  } else {
+    res.status(400).json({
+      message: "Developer not found",
+    });
+  }
+};
+
 const checkInfoRequiredKeys = async (
   req: Request,
   res: Response,
@@ -33,39 +65,68 @@ const checkInfoInvalidKeys = async (
     preferredOS: req.body.preferredOS,
   };
 
+  req.info = {
+    handledDevInfo: newBody,
+  };
+
   return next();
 };
 
-// const checkUniqueInfo = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ): Promise<Response | void> => {
-//   const getEmail = req.developer.treatedBody.email;
+const checkUniqueInfo = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const id: number = +req.params.id;
 
-//   const queryString = `
-//   SELECT
-//     email
-//   FROM
-//     developers
-//   WHERE
-//     email = $1
-//     `;
+  const queryString = `
+  SELECT
+    "developerInfoID"
+  FROM
+    developers
+  WHERE
+    "developerInfoID" = $1
+    `;
 
-//   const queryConfig: QueryConfig = {
-//     text: queryString,
-//     values: [getEmail],
-//   };
+  const queryConfig: QueryConfig = {
+    text: queryString,
+    values: [id],
+  };
 
-//   const queryResult: any = await client.query(queryConfig);
+  const queryResult: any = await client.query(queryConfig);
 
-//   if (queryResult.rowCount === 0) {
-//     return next();
-//   } else {
-//     res.status(409).json({
-//       message: "Email already exists",
-//     });
-//   }
-// };
+  if (queryResult.rowCount === 0) {
+    return next();
+  } else {
+    res.status(400).json({
+      message: "Developer info are already registered",
+    });
+  }
+};
 
-export { checkInfoRequiredKeys, checkInfoInvalidKeys };
+const checkOS = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const data = req.info.handledDevInfo;
+  const OsOptions = ["Windows", "Linux", "MacOS"];
+  const checkOsData = OsOptions.includes(data.preferredOS);
+
+  if (checkOsData) {
+    return next();
+  } else {
+    res.status(400).json({
+      message: "invalid 'OS' option",
+      options: ["Windows", "Linux", "MacOs"],
+    });
+  }
+};
+
+export {
+  checkIfDeveloperExists,
+  checkInfoRequiredKeys,
+  checkInfoInvalidKeys,
+  checkUniqueInfo,
+  checkOS,
+};

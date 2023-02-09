@@ -5,10 +5,10 @@ declare global {
   namespace Express {
     interface Request {
       developer: {
-        treatedBody: createdDev;
+        handledBody: createdDev;
       };
       info: {
-        treatedDevInfo: createdDevInfo;
+        handledDevInfo: createdDevInfo;
       };
     }
   }
