@@ -1,4 +1,4 @@
-import { Request, Response, text } from "express";
+import { query, request, Request, Response, text } from "express";
 import { QueryConfig, QueryParse } from "pg";
 import format from "pg-format";
 import { client } from "../database";
@@ -12,13 +12,12 @@ const createDeveloper = async (
   const dataValues = Object.values(req.developer.handledBody);
   const queryString: string = format(
     `
-      INSERT INTO 
-        developers (%I)
-      VALUES 
-        (%L)
-      RETURNING 
-        *;
-      `,
+  INSERT INTO 
+      developers (%I)
+  VALUES 
+      (%L)
+  RETURNING *;
+  `,
     dataKeys,
     dataValues
   );
@@ -36,17 +35,17 @@ const createDeveloperInfo = async (
   const dataValues = Object.values(req.info.handledDevInfo);
   let queryString: string = format(
     `
-      INSERT INTO 
-        developers_info (%I)
-      VALUES 
-        (%L)
-      RETURNING *;
-      `,
+  INSERT INTO 
+      developers_info (%I)
+  VALUES 
+      (%L)
+  RETURNING *;
+  `,
     dataKeys,
     dataValues
   );
 
-  const queryResult: any = await client.query(queryString);
+  const queryResult: resDevInfo = await client.query(queryString);
 
   queryString = `
   UPDATE
@@ -67,4 +66,140 @@ const createDeveloperInfo = async (
   return res.status(201).json(queryResult.rows[0]);
 };
 
-export { createDeveloper, createDeveloperInfo };
+const getAllDevelopers = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const queryStringDevInfoNotNull = `
+	SELECT
+   		*
+  FROM 
+   		developers_info AS di 
+  JOIN 
+   		developers AS d ON di. id = d."developerInfoID";`;
+
+  const queryStringDevInfoNull = `
+  SELECT
+   		*
+  FROM  	
+   		developers
+  WHERE 
+      "developerInfoID" IS NULL;
+  `;
+
+  const queryResultNotNull: any = await client.query(queryStringDevInfoNotNull);
+  const queryResultNull: any = await client.query(queryStringDevInfoNull);
+
+  const resFormattingNotNull = queryResultNotNull.rows.map(
+    (dev: any) =>
+      (dev = {
+        id: dev.id,
+        name: dev.name,
+        email: dev.email,
+        developerInfoID: dev.developerInfoID,
+        developerSince: dev.developerSince,
+        preferredOS: dev.preferredOS,
+      })
+  );
+  const resFormattingNull = queryResultNull.rows.map(
+    (dev: any) =>
+      (dev = {
+        id: dev.id,
+        name: dev.name,
+        email: dev.email,
+        developerInfoID: dev.developerInfoID,
+        developerSince: null,
+        preferredOS: null,
+      })
+  );
+
+  const completeRes = [...resFormattingNotNull, ...resFormattingNull];
+
+  return res.status(200).json(completeRes);
+};
+
+const getDeveloperByid = async (
+  req: Request,
+  res: Response
+): Promise<Response | void> => {
+  let resDeposit: Array<any> = [];
+  const id: number = +req.params.id;
+  const queryString = `
+    SELECT
+        *
+    FROM
+        developers
+    WHERE
+        id = $1`;
+  const queryConfig: QueryConfig = {
+    text: queryString,
+    values: [id],
+  };
+  const queryResult = await client.query(queryConfig);
+  const foundUser = queryResult.rows[0];
+  if (foundUser.developerInfoID !== null) {
+    const checkInfoId: number = +foundUser.developerInfoID;
+    const queryString = `
+	SELECT
+   		*
+  FROM 
+   		developers_info AS di 
+  JOIN 
+   		developers AS d ON di. id = d."developerInfoID"
+  WHERE di.id = $1;`;
+
+    const queryConfig: QueryConfig = {
+      text: queryString,
+      values: [checkInfoId],
+    };
+    const queryResult = await client.query(queryConfig);
+    const resFormat = queryResult.rows.map(
+      (dev: any) =>
+        (dev = {
+          id: dev.id,
+          name: dev.name,
+          email: dev.email,
+          developerInfoID: dev.developerInfoID,
+          developerSince: dev.developerSince,
+          preferredOS: dev.preferredOS,
+        })
+    );
+    resDeposit = resFormat;
+  } else {
+    const queryString = `
+    SELECT 
+        *
+    FROM
+        developers
+    WHERE
+        id = $1
+    `;
+
+    const queryConfig: QueryConfig = {
+      text: queryString,
+      values: [id],
+    };
+    const queryResult = await client.query(queryConfig);
+    const resFormat = queryResult.rows.map(
+      (dev: any) =>
+        (dev = {
+          id: dev.id,
+          name: dev.name,
+          email: dev.email,
+          developerInfoID: dev.developerInfoID,
+          developerSince: null,
+          preferredOS: null,
+        })
+    );
+    resDeposit = resFormat;
+  }
+
+  return res.status(200).json(resDeposit);
+};
+
+export {
+  createDeveloper,
+  createDeveloperInfo,
+  getAllDevelopers,
+  getDeveloperByid,
+};

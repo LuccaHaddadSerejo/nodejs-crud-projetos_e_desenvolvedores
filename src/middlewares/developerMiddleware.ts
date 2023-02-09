@@ -3,6 +3,38 @@ import { createdDev } from "../@types/types";
 import { QueryConfig } from "pg";
 import { client } from "../database";
 
+const checkIfDeveloperExists = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const id = +req.params.id;
+
+  const queryString = `
+  SELECT
+      *
+  FROM
+      developers
+  WHERE 
+      id = $1;
+  `;
+
+  const queryConfig: QueryConfig = {
+    text: queryString,
+    values: [id],
+  };
+
+  const queryResult: any = await client.query(queryConfig);
+
+  if (queryResult.rowCount > 0) {
+    return next();
+  } else {
+    res.status(400).json({
+      message: "Developer not found",
+    });
+  }
+};
+
 const checkRequiredKeys = async (
   req: Request,
   res: Response,
@@ -47,12 +79,12 @@ const checkUniqueEmail = async (
 
   const queryString = `
   SELECT 
-    email 
+      email 
   FROM 
-    developers
+      developers
   WHERE
-    email = $1
-    `;
+      email = $1
+  `;
 
   const queryConfig: QueryConfig = {
     text: queryString,
@@ -70,4 +102,9 @@ const checkUniqueEmail = async (
   }
 };
 
-export { checkRequiredKeys, checkInvalidKeys, checkUniqueEmail };
+export {
+  checkRequiredKeys,
+  checkInvalidKeys,
+  checkUniqueEmail,
+  checkIfDeveloperExists,
+};

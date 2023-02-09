@@ -1,13 +1,18 @@
 import express, { Application } from "express";
 import { startDatabase } from "./database";
-import { createDeveloper, createDeveloperInfo } from "./logic/developerLogic";
 import {
+  createDeveloper,
+  createDeveloperInfo,
+  getAllDevelopers,
+  getDeveloperByid,
+} from "./logic/developerLogic";
+import {
+  checkIfDeveloperExists,
   checkInvalidKeys,
   checkRequiredKeys,
   checkUniqueEmail,
 } from "../src/middlewares/developerMiddleware";
 import {
-  checkIfDeveloperExists,
   checkInfoInvalidKeys,
   checkInfoRequiredKeys,
   checkUniqueInfo,
@@ -34,7 +39,10 @@ app.post(
   checkOS,
   createDeveloperInfo
 );
-app.get("/developers", createDeveloper);
+
+app.get("/developers", getAllDevelopers);
+
+app.get("/developers/:id", checkIfDeveloperExists, getDeveloperByid);
 
 app.listen(3000, async () => {
   console.log("Server is running!");
