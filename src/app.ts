@@ -3,6 +3,7 @@ import { startDatabase } from "./database";
 import {
   createDeveloper,
   createDeveloperInfo,
+  deleteDeveloper,
   getAllDevelopers,
   getDeveloperByid,
   updateDeveloper,
@@ -65,6 +66,8 @@ app.patch(
   checkOS,
   updateDeveloperInfo
 );
+
+app.delete("/developers/:id", checkIfDeveloperExists, deleteDeveloper);
 
 app.listen(3000, async () => {
   console.log("Server is running!");

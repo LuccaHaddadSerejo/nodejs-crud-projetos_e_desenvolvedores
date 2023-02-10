@@ -10,6 +10,7 @@ const createDeveloper = async (
 ): Promise<Response> => {
   const dataKeys = Object.keys(req.developer.handledBody);
   const dataValues = Object.values(req.developer.handledBody);
+
   const queryString: string = format(
     `
   INSERT INTO 
@@ -23,6 +24,7 @@ const createDeveloper = async (
   );
 
   const QueryResult: resDev = await client.query(queryString);
+
   return res.status(201).json(QueryResult.rows[0]);
 };
 
@@ -33,6 +35,7 @@ const createDeveloperInfo = async (
   const devId: number = +req.params.id;
   const dataKeys = Object.keys(req.info.handledDevInfo);
   const dataValues = Object.values(req.info.handledDevInfo);
+
   let queryString: string = format(
     `
   INSERT INTO 
@@ -125,34 +128,40 @@ const getDeveloperByid = async (
   let resDeposit: Array<any> = [];
   const id: number = +req.params.id;
   const queryString = `
-    SELECT
-        *
-    FROM
-        developers
-    WHERE
-        id = $1`;
+  SELECT
+      *
+  FROM
+      developers
+  WHERE
+      id = $1;`;
+
   const queryConfig: QueryConfig = {
     text: queryString,
     values: [id],
   };
+
   const queryResult = await client.query(queryConfig);
   const foundUser = queryResult.rows[0];
+
   if (foundUser.developerInfoID !== null) {
     const checkInfoId: number = +foundUser.developerInfoID;
     const queryString = `
-	SELECT
-   		*
-  FROM 
-   		developers_info AS di 
-  JOIN 
-   		developers AS d ON di. id = d."developerInfoID"
-  WHERE di.id = $1;`;
+	  SELECT
+   		  *
+    FROM 
+   		  developers_info AS di 
+    JOIN 
+   		  developers AS d ON di. id = d."developerInfoID"
+    WHERE 
+        di.id = $1;`;
 
     const queryConfig: QueryConfig = {
       text: queryString,
       values: [checkInfoId],
     };
+
     const queryResult = await client.query(queryConfig);
+
     const resFormat = queryResult.rows.map(
       (dev: any) =>
         (dev = {
@@ -179,7 +188,9 @@ const getDeveloperByid = async (
       text: queryString,
       values: [id],
     };
+
     const queryResult = await client.query(queryConfig);
+
     const resFormat = queryResult.rows.map(
       (dev: any) =>
         (dev = {
@@ -191,6 +202,7 @@ const getDeveloperByid = async (
           preferredOS: null,
         })
     );
+
     resDeposit = resFormat;
   }
 
@@ -226,10 +238,33 @@ const updateDeveloper = async (
   return res.status(200).json(queryResult.rows[0]);
 };
 
+const deleteDeveloper = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const id = req.params.id;
+  const queryString = `
+  DELETE FROM 
+      developers 
+  WHERE 
+      id = $1 
+  RETURNING *;`;
+
+  const queryConfig: QueryConfig = {
+    text: queryString,
+    values: [id],
+  };
+
+  await client.query(queryConfig);
+
+  return res.status(204).json();
+};
+
 export {
   createDeveloper,
   createDeveloperInfo,
   getAllDevelopers,
   getDeveloperByid,
   updateDeveloper,
+  deleteDeveloper,
 };
