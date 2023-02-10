@@ -47,32 +47,24 @@ const checkInfoInvalidKeys = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  if (req.body.developerSince && req.body.preferredOS) {
-    const newBody: createdDevInfo = {
-      developerSince: req.body.developerSince,
-      preferredOS: req.body.preferredOS,
-    };
-    req.info = {
-      handledDevInfo: newBody,
-    };
-    return next();
-  } else if (req.body.developerSince && req.body.preferredOS === undefined) {
-    const newBody: createdDevInfo = {
-      developerSince: req.body.developerSince,
-    };
-    req.info = {
-      handledDevInfo: newBody,
-    };
-    return next();
-  } else if (req.body.developerSince === undefined && req.body.preferredOS) {
-    const newBody: createdDevInfo = {
-      preferredOS: req.body.preferredOS,
-    };
-    req.info = {
-      handledDevInfo: newBody,
-    };
-    return next();
-  }
+  const keys = Object.keys(req.body);
+  const requiredKeys = ["preferredOS", "developerSince"];
+  const filterKey = keys.filter(
+    (key: string) => requiredKeys.includes(key) === false
+  );
+
+  const deleteKeys = (body: any, unwantedKeys: string[]): createdDevInfo => {
+    unwantedKeys.map((key: string) => delete body[key]);
+    return body;
+  };
+
+  const result: createdDevInfo = deleteKeys(req.body, filterKey);
+
+  req.info = {
+    handledDevInfo: result,
+  };
+
+  return next();
 };
 
 const checkUniqueInfo = async (

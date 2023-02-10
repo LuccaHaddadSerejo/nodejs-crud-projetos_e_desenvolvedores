@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { createdDev, resDev } from "../@types/types";
+import { createdDev, resDev, iReqDev } from "../@types/types";
 import { QueryConfig } from "pg";
 import { client } from "../database";
 
@@ -78,32 +78,24 @@ const checkInvalidKeys = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  if (req.body.name && req.body.email) {
-    const newBody: createdDev = {
-      name: req.body.name,
-      email: req.body.email,
-    };
-    req.developer = {
-      handledBody: newBody,
-    };
-    return next();
-  } else if (req.body.name && req.body.email === undefined) {
-    const newBody: createdDev = {
-      name: req.body.name,
-    };
-    req.developer = {
-      handledBody: newBody,
-    };
-    return next();
-  } else if (req.body.name === undefined && req.body.email) {
-    const newBody: createdDev = {
-      email: req.body.email,
-    };
-    req.developer = {
-      handledBody: newBody,
-    };
-    return next();
-  }
+  const keys = Object.keys(req.body);
+  const requiredKeys = ["name", "email"];
+  const filterKey = keys.filter(
+    (key: string) => requiredKeys.includes(key) === false
+  );
+
+  const deleteKeys = (body: any, unwantedKeys: string[]): createdDev => {
+    unwantedKeys.map((key: string) => delete body[key]);
+    return body;
+  };
+
+  const result: createdDev = deleteKeys(req.body, filterKey);
+
+  req.developer = {
+    handledBody: result,
+  };
+
+  return next();
 };
 
 const checkUniqueEmail = async (
