@@ -5,11 +5,14 @@ import {
   createDeveloperInfo,
   getAllDevelopers,
   getDeveloperByid,
+  updateDeveloper,
 } from "./logic/developerLogic";
+import { updateDeveloperInfo } from "../src/logic/developerInfoLogic";
 import {
   checkIfDeveloperExists,
   checkInvalidKeys,
   checkRequiredKeys,
+  checkRequiredKeysPatch,
   checkUniqueEmail,
 } from "../src/middlewares/developerMiddleware";
 import {
@@ -17,6 +20,7 @@ import {
   checkInfoRequiredKeys,
   checkUniqueInfo,
   checkOS,
+  checkInfoRequiredKeysPatch,
 } from "../src/middlewares/devInfoMiddleware";
 
 const app: Application = express();
@@ -43,6 +47,24 @@ app.post(
 app.get("/developers", getAllDevelopers);
 
 app.get("/developers/:id", checkIfDeveloperExists, getDeveloperByid);
+
+app.patch(
+  "/developers/:id",
+  checkIfDeveloperExists,
+  checkRequiredKeysPatch,
+  checkInvalidKeys,
+  checkUniqueEmail,
+  updateDeveloper
+);
+
+app.patch(
+  "/developers/:id/infos",
+  checkIfDeveloperExists,
+  checkInfoRequiredKeysPatch,
+  checkInfoInvalidKeys,
+  checkOS,
+  updateDeveloperInfo
+);
 
 app.listen(3000, async () => {
   console.log("Server is running!");

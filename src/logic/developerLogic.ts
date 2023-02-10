@@ -1,5 +1,5 @@
-import { query, request, Request, Response, text } from "express";
-import { QueryConfig, QueryParse } from "pg";
+import { Request, Response } from "express";
+import { QueryConfig } from "pg";
 import format from "pg-format";
 import { client } from "../database";
 import { resDev, resDevInfo } from "../@types/types";
@@ -197,9 +197,39 @@ const getDeveloperByid = async (
   return res.status(200).json(resDeposit);
 };
 
+const updateDeveloper = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const id: number = +req.params.id;
+  const dataKeys = Object.keys(req.developer.handledBody);
+  const dataValues = Object.values(req.developer.handledBody);
+  const queryString: string = format(
+    `
+    UPDATE developers
+    SET (%I) = ROW(%L)
+    WHERE id = $1
+    RETURNING *;
+    `,
+    dataKeys,
+    dataValues,
+    id
+  );
+
+  const queryConfig: QueryConfig = {
+    text: queryString,
+    values: [id],
+  };
+
+  const queryResult: resDev = await client.query(queryConfig);
+
+  return res.status(200).json(queryResult.rows[0]);
+};
+
 export {
   createDeveloper,
   createDeveloperInfo,
   getAllDevelopers,
   getDeveloperByid,
+  updateDeveloper,
 };

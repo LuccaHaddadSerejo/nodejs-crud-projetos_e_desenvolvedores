@@ -54,20 +54,56 @@ const checkRequiredKeys = async (
   }
 };
 
+const checkRequiredKeysPatch = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const keys = Object.keys(req.body);
+  const requiredKeys = ["name", "email"];
+
+  const checkKeys = requiredKeys.some((key) => keys.includes(key));
+
+  if (checkKeys) {
+    return next();
+  } else {
+    res.status(400).json({
+      message: "missing one of the required keys: name, email",
+    });
+  }
+};
+
 const checkInvalidKeys = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const newBody: createdDev = {
-    name: req.body.name,
-    email: req.body.email,
-  };
-
-  req.developer = {
-    handledBody: newBody,
-  };
-  return next();
+  if (req.body.name && req.body.email) {
+    const newBody: createdDev = {
+      name: req.body.name,
+      email: req.body.email,
+    };
+    req.developer = {
+      handledBody: newBody,
+    };
+    return next();
+  } else if (req.body.name && req.body.email === undefined) {
+    const newBody: createdDev = {
+      name: req.body.name,
+    };
+    req.developer = {
+      handledBody: newBody,
+    };
+    return next();
+  } else if (req.body.name === undefined && req.body.email) {
+    const newBody: createdDev = {
+      email: req.body.email,
+    };
+    req.developer = {
+      handledBody: newBody,
+    };
+    return next();
+  }
 };
 
 const checkUniqueEmail = async (
@@ -104,6 +140,7 @@ const checkUniqueEmail = async (
 
 export {
   checkRequiredKeys,
+  checkRequiredKeysPatch,
   checkInvalidKeys,
   checkUniqueEmail,
   checkIfDeveloperExists,

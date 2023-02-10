@@ -23,21 +23,56 @@ const checkInfoRequiredKeys = async (
   }
 };
 
+const checkInfoRequiredKeysPatch = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const keys = Object.keys(req.body);
+  const requiredKeys = ["developerSince", "preferredOS"];
+
+  const checkKeys = requiredKeys.some((key) => keys.includes(key));
+
+  if (checkKeys) {
+    return next();
+  } else {
+    res.status(400).json({
+      message: "missing one of the required keys: developerSince, preferredOS",
+    });
+  }
+};
+
 const checkInfoInvalidKeys = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const newBody: createdDevInfo = {
-    developerSince: req.body.developerSince,
-    preferredOS: req.body.preferredOS,
-  };
-
-  req.info = {
-    handledDevInfo: newBody,
-  };
-
-  return next();
+  if (req.body.developerSince && req.body.preferredOS) {
+    const newBody: createdDevInfo = {
+      developerSince: req.body.developerSince,
+      preferredOS: req.body.preferredOS,
+    };
+    req.info = {
+      handledDevInfo: newBody,
+    };
+    return next();
+  } else if (req.body.developerSince && req.body.preferredOS === undefined) {
+    const newBody: createdDevInfo = {
+      developerSince: req.body.developerSince,
+    };
+    req.info = {
+      handledDevInfo: newBody,
+    };
+    return next();
+  } else if (req.body.developerSince === undefined && req.body.preferredOS) {
+    const newBody: createdDevInfo = {
+      preferredOS: req.body.preferredOS,
+    };
+    req.info = {
+      handledDevInfo: newBody,
+    };
+    return next();
+  }
 };
 
 const checkUniqueInfo = async (
@@ -79,7 +114,7 @@ const checkOS = async (
 ): Promise<Response | void> => {
   const data = req.info.handledDevInfo;
   const OsOptions = ["Windows", "Linux", "MacOS"];
-  const checkOsData = OsOptions.includes(data.preferredOS);
+  const checkOsData = OsOptions.includes(data.preferredOS!);
 
   if (checkOsData) {
     return next();
@@ -93,6 +128,7 @@ const checkOS = async (
 
 export {
   checkInfoRequiredKeys,
+  checkInfoRequiredKeysPatch,
   checkInfoInvalidKeys,
   checkUniqueInfo,
   checkOS,

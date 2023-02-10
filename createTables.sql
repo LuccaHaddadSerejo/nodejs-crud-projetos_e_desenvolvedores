@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS developers(
 	"name" VARCHAR(50) NOT NULL,
 	"email" VARCHAR(50) NOT NULL,
 	"developerInfoID" INTEGER UNIQUE,
-	FOREIGN KEY ("developerInfoID") REFERENCES developer_info(id) 
+	FOREIGN KEY ("developerInfoID") REFERENCES developers_info(id) ON DELETE CASCADE
 );
 	
 CREATE TABLE IF NOT EXISTS developers_info(
