@@ -2,12 +2,7 @@ import { Request, Response } from "express";
 import { QueryConfig } from "pg";
 import format from "pg-format";
 import { client } from "../database";
-import {
-  devWithInfo,
-  resDev,
-  resDevInfo,
-  resDevWithInfo,
-} from "../@types/types";
+import { resDev, resDevInfo, resDevWithInfo } from "../@types/types";
 
 const createDeveloper = async (
   req: Request,
@@ -78,158 +73,65 @@ const getAllDevelopers = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const queryStringDevInfoNotNull = `
+  const queryString = `
 	SELECT
-   		*
+   		d.*,
+      di."developerSince",
+      di."preferredOS"
   FROM 
-   		developers_info AS di 
-  JOIN 
-   		developers AS d ON di. id = d."developerInfoID";`;
-
-  const queryStringDevInfoNull = `
-  SELECT
-   		*
-  FROM  	
-   		developers
-  WHERE 
-      "developerInfoID" IS NULL;
+   		developers AS d 
+  LEFT JOIN
+   		developers_info AS di ON di.id = d."developerInfoID"
   `;
 
-  const queryResultNotNull: resDevWithInfo = await client.query(
-    queryStringDevInfoNotNull
-  );
-  const queryResultNull: resDevWithInfo = await client.query(
-    queryStringDevInfoNull
-  );
+  const queryResult: resDevWithInfo = await client.query(queryString);
 
-  const resFormattingNotNull = queryResultNotNull.rows.map(
-    (dev: devWithInfo) =>
-      (dev = {
-        id: dev.id,
-        name: dev.name,
-        email: dev.email,
-        developerInfoID: dev.developerInfoID,
-        developerSince: dev.developerSince,
-        preferredOS: dev.preferredOS,
-      })
-  );
-  const resFormattingNull = queryResultNull.rows.map(
-    (dev: devWithInfo) =>
-      (dev = {
-        id: dev.id,
-        name: dev.name,
-        email: dev.email,
-        developerInfoID: dev.developerInfoID,
-        developerSince: null,
-        preferredOS: null,
-      })
-  );
-
-  const completeRes = [...resFormattingNotNull, ...resFormattingNull];
-
-  return res.status(200).json(completeRes);
+  return res.status(200).json(queryResult.rows);
 };
 
 const getDeveloperByid = async (
   req: Request,
   res: Response
 ): Promise<Response | void> => {
-  let resDeposit: devWithInfo[] = [];
-  const id: number = +req.params.id;
+  const id = req.params.id;
+
   const queryString = `
   SELECT
-      *
-  FROM
-      developers
+      d.*,
+      di."developerSince",
+      di."preferredOS"
+  FROM 
+      developers AS d 
+  LEFT JOIN
+      developers_info AS di ON di.id = d."developerInfoID"
   WHERE
-      id = $1;`;
+      d.id = $1;
+  `;
 
   const queryConfig: QueryConfig = {
     text: queryString,
     values: [id],
   };
 
-  const queryResult = await client.query(queryConfig);
-  const foundUser = queryResult.rows[0];
+  const queryResult: resDevWithInfo = await client.query(queryConfig);
 
-  if (foundUser.developerInfoID !== null) {
-    const checkInfoId: number = +foundUser.developerInfoID;
-    const queryString = `
-	  SELECT
-   		  *
-    FROM 
-   		  developers_info AS di 
-    JOIN 
-   		  developers AS d ON di. id = d."developerInfoID"
-    WHERE 
-        di.id = $1;`;
-
-    const queryConfig: QueryConfig = {
-      text: queryString,
-      values: [checkInfoId],
-    };
-
-    const queryResult = await client.query(queryConfig);
-
-    const resFormat = queryResult.rows.map(
-      (dev: devWithInfo) =>
-        (dev = {
-          id: dev.id,
-          name: dev.name,
-          email: dev.email,
-          developerInfoID: dev.developerInfoID,
-          developerSince: dev.developerSince,
-          preferredOS: dev.preferredOS,
-        })
-    );
-    resDeposit = resFormat;
-  } else {
-    const queryString = `
-    SELECT 
-        *
-    FROM
-        developers
-    WHERE
-        id = $1
-    `;
-
-    const queryConfig: QueryConfig = {
-      text: queryString,
-      values: [id],
-    };
-
-    const queryResult = await client.query(queryConfig);
-
-    const resFormat = queryResult.rows.map(
-      (dev: devWithInfo) =>
-        (dev = {
-          id: dev.id,
-          name: dev.name,
-          email: dev.email,
-          developerInfoID: dev.developerInfoID,
-          developerSince: null,
-          preferredOS: null,
-        })
-    );
-
-    resDeposit = resFormat;
-  }
-
-  return res.status(200).json(resDeposit);
+  return res.status(200).json(queryResult.rows[0]);
 };
 
 const updateDeveloper = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const id: number = +req.params.id;
+  const id = req.params.id;
   const dataKeys = Object.keys(req.developer.handledBody);
   const dataValues = Object.values(req.developer.handledBody);
   const queryString: string = format(
     `
-    UPDATE developers
+    UPDATE 
+      developers
     SET (%I) = ROW(%L)
-    WHERE id = $1
+    WHERE 
+      id = $1
     RETURNING *;
     `,
     dataKeys,
@@ -242,7 +144,7 @@ const updateDeveloper = async (
     values: [id],
   };
 
-  const queryResult: resDev = await client.query(queryConfig);
+  const queryResult: resDevWithInfo = await client.query(queryConfig);
 
   return res.status(200).json(queryResult.rows[0]);
 };

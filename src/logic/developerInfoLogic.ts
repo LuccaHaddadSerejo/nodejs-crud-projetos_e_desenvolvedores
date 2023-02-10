@@ -8,7 +8,7 @@ const updateDeveloperInfo = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const id: number = +req.params.id;
+  const id = req.params.id;
   const dataKeys = Object.keys(req.info.handledDevInfo);
   const dataValues = Object.values(req.info.handledDevInfo);
 
@@ -33,9 +33,11 @@ const updateDeveloperInfo = async (
 
   const queryString: string = format(
     `
-      UPDATE developers_info
+      UPDATE 
+          developers_info
       SET (%I) = ROW(%L)
-      WHERE id = $1
+      WHERE 
+          id = $1
       RETURNING *;
       `,
     dataKeys,
