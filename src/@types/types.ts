@@ -1,9 +1,9 @@
 import { QueryResult } from "pg";
 
 interface iReqDev {
-  name?: string;
-  email?: string;
-  iDeveloperInfo?: number | null;
+  name?: string | undefined;
+  email?: string | undefined;
+  developerInfoID?: number | null | undefined;
 }
 
 interface iDev extends iReqDev {
@@ -14,8 +14,8 @@ type resDev = QueryResult<iDev>;
 type createdDev = Omit<iDev, "id">;
 
 interface iReqDevInfo {
-  developerSince?: Date;
-  preferredOS?: "Windows" | "Linux" | "MacOS";
+  developerSince?: Date | null | undefined;
+  preferredOS?: "Windows" | "Linux" | "MacOS" | null | undefined;
 }
 
 interface iDevInfo extends iReqDevInfo {
@@ -25,6 +25,9 @@ interface iDevInfo extends iReqDevInfo {
 type resDevInfo = QueryResult<iDevInfo>;
 type createdDevInfo = Omit<iDevInfo, "id">;
 
+type devWithInfo = iDev & iReqDevInfo;
+type resDevWithInfo = QueryResult<devWithInfo>;
+
 export {
   iReqDev,
   iDev,
@@ -33,4 +36,6 @@ export {
   iReqDevInfo,
   resDevInfo,
   createdDevInfo,
+  devWithInfo,
+  resDevWithInfo,
 };

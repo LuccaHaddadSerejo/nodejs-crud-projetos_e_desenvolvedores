@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { createdDev } from "../@types/types";
+import { createdDev, resDev } from "../@types/types";
 import { QueryConfig } from "pg";
 import { client } from "../database";
 
@@ -24,7 +24,7 @@ const checkIfDeveloperExists = async (
     values: [id],
   };
 
-  const queryResult: any = await client.query(queryConfig);
+  const queryResult: resDev = await client.query(queryConfig);
 
   if (queryResult.rowCount > 0) {
     return next();
@@ -115,7 +115,7 @@ const checkUniqueEmail = async (
 
   const queryString = `
   SELECT 
-      email 
+      *
   FROM 
       developers
   WHERE
@@ -127,7 +127,7 @@ const checkUniqueEmail = async (
     values: [getEmail],
   };
 
-  const queryResult: any = await client.query(queryConfig);
+  const queryResult: resDev = await client.query(queryConfig);
 
   if (queryResult.rowCount === 0) {
     return next();

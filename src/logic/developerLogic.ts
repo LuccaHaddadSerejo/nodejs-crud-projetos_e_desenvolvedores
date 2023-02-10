@@ -2,7 +2,12 @@ import { Request, Response } from "express";
 import { QueryConfig } from "pg";
 import format from "pg-format";
 import { client } from "../database";
-import { resDev, resDevInfo } from "../@types/types";
+import {
+  devWithInfo,
+  resDev,
+  resDevInfo,
+  resDevWithInfo,
+} from "../@types/types";
 
 const createDeveloper = async (
   req: Request,
@@ -90,11 +95,15 @@ const getAllDevelopers = async (
       "developerInfoID" IS NULL;
   `;
 
-  const queryResultNotNull: any = await client.query(queryStringDevInfoNotNull);
-  const queryResultNull: any = await client.query(queryStringDevInfoNull);
+  const queryResultNotNull: resDevWithInfo = await client.query(
+    queryStringDevInfoNotNull
+  );
+  const queryResultNull: resDevWithInfo = await client.query(
+    queryStringDevInfoNull
+  );
 
   const resFormattingNotNull = queryResultNotNull.rows.map(
-    (dev: any) =>
+    (dev: devWithInfo) =>
       (dev = {
         id: dev.id,
         name: dev.name,
@@ -105,7 +114,7 @@ const getAllDevelopers = async (
       })
   );
   const resFormattingNull = queryResultNull.rows.map(
-    (dev: any) =>
+    (dev: devWithInfo) =>
       (dev = {
         id: dev.id,
         name: dev.name,
@@ -125,7 +134,7 @@ const getDeveloperByid = async (
   req: Request,
   res: Response
 ): Promise<Response | void> => {
-  let resDeposit: Array<any> = [];
+  let resDeposit: devWithInfo[] = [];
   const id: number = +req.params.id;
   const queryString = `
   SELECT
@@ -163,7 +172,7 @@ const getDeveloperByid = async (
     const queryResult = await client.query(queryConfig);
 
     const resFormat = queryResult.rows.map(
-      (dev: any) =>
+      (dev: devWithInfo) =>
         (dev = {
           id: dev.id,
           name: dev.name,
@@ -192,7 +201,7 @@ const getDeveloperByid = async (
     const queryResult = await client.query(queryConfig);
 
     const resFormat = queryResult.rows.map(
-      (dev: any) =>
+      (dev: devWithInfo) =>
         (dev = {
           id: dev.id,
           name: dev.name,

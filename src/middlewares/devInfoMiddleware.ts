@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { createdDevInfo } from "../@types/types";
+import { createdDevInfo, resDev } from "../@types/types";
 import { QueryConfig } from "pg";
 import { client } from "../database";
 
@@ -96,7 +96,7 @@ const checkUniqueInfo = async (
     values: [id],
   };
 
-  const queryResult: any = await client.query(queryConfig);
+  const queryResult: resDev = await client.query(queryConfig);
 
   if (queryResult.rows[0].developerInfoID) {
     res.status(400).json({
