@@ -86,7 +86,51 @@ const checkProjectRequiredKeys = async (
     return next();
   } else {
     res.status(400).json({
-      message: `missing one or multiple of the required keys: ${requiredKeys}`,
+      message: "At least one of those keys must be send.",
+      keys: [
+        "name",
+        "description",
+        "estimatedTime",
+        "repository",
+        "startDate",
+        "developerId",
+      ],
+    });
+  }
+};
+
+const checkProjectRequiredKeysPatch = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const keys = Object.keys(req.body);
+  const requiredKeys = [
+    "name",
+    "description",
+    "estimatedTime",
+    "repository",
+    "startDate",
+    "endDate",
+    "developerId",
+  ];
+
+  const checkKeys = requiredKeys.some((key) => keys.includes(key));
+
+  if (checkKeys) {
+    return next();
+  } else {
+    res.status(400).json({
+      message: "At least one of those keys must be send.",
+      keys: [
+        "name",
+        "description",
+        "estimatedTime",
+        "repository",
+        "startDate",
+        "endDate",
+        "developerId",
+      ],
     });
   }
 };
@@ -123,9 +167,44 @@ const checkProjectInvalidKeys = async (
   return next();
 };
 
+const checkProjectInvalidKeysPatch = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const keys = Object.keys(req.body);
+  const requiredKeys = [
+    "name",
+    "description",
+    "estimatedTime",
+    "repository",
+    "startDate",
+    "endDate",
+    "developerId",
+  ];
+  const filterKey = keys.filter(
+    (key: string) => requiredKeys.includes(key) === false
+  );
+
+  const deleteKeys = (body: any, unwantedKeys: string[]): any => {
+    unwantedKeys.map((key: string) => delete body[key]);
+    return body;
+  };
+
+  const result: any = deleteKeys(req.body, filterKey);
+
+  req.project = {
+    handledProjectBody: result,
+  };
+
+  return next();
+};
+
 export {
   checkIfProjectDeveloperExists,
   checkIfProjectExists,
   checkProjectRequiredKeys,
   checkProjectInvalidKeys,
+  checkProjectRequiredKeysPatch,
+  checkProjectInvalidKeysPatch,
 };

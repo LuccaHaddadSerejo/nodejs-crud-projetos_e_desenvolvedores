@@ -11,8 +11,10 @@ import {
 import { updateDeveloperInfo } from "../src/logic/developerInfoLogic";
 import {
   createProject,
+  deleteProject,
   getAllProjects,
   getProjectById,
+  updateProject,
 } from "../src/logic/projectLogic";
 import {
   checkIfDeveloperExists,
@@ -33,6 +35,8 @@ import {
   checkProjectRequiredKeys,
   checkProjectInvalidKeys,
   checkIfProjectExists,
+  checkProjectRequiredKeysPatch,
+  checkProjectInvalidKeysPatch,
 } from "../src/middlewares/projectMiddlewares";
 
 const app: Application = express();
@@ -90,7 +94,17 @@ app.patch(
   updateDeveloperInfo
 );
 
+app.patch(
+  "/projects/:id",
+  checkIfProjectExists,
+  checkProjectRequiredKeysPatch,
+  checkProjectInvalidKeysPatch,
+  updateProject
+);
+
 app.delete("/developers/:id", checkIfDeveloperExists, deleteDeveloper);
+
+app.delete("/projects/:id", checkIfProjectExists, deleteProject);
 
 app.listen(3000, async () => {
   console.log("Server is running!");

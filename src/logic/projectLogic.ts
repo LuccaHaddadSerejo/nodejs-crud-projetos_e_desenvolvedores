@@ -95,7 +95,59 @@ const updateProject = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  return res.json();
+  const id = req.params.id;
+  const dataKeys = Object.keys(req.project.handledProjectBody);
+  const dataValues = Object.values(req.project.handledProjectBody);
+  const queryString: string = format(
+    `
+      UPDATE 
+        projects
+      SET (%I) = ROW(%L)
+      WHERE 
+        id = $1
+      RETURNING *;
+      `,
+    dataKeys,
+    dataValues,
+    id
+  );
+
+  const queryConfig: QueryConfig = {
+    text: queryString,
+    values: [id],
+  };
+
+  const queryResult: any = await client.query(queryConfig);
+
+  return res.status(200).json(queryResult.rows[0]);
 };
 
-export { createProject, getAllProjects, getProjectById };
+const deleteProject = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const id: number = +req.params.id;
+  const queryString = `
+  DELETE FROM 
+      projects 
+  WHERE 
+      id = $1 
+  RETURNING *;`;
+
+  const queryConfig: QueryConfig = {
+    text: queryString,
+    values: [id],
+  };
+
+  await client.query(queryConfig);
+
+  return res.status(204).json();
+};
+
+export {
+  createProject,
+  getAllProjects,
+  getProjectById,
+  updateProject,
+  deleteProject,
+};
