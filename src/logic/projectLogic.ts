@@ -49,7 +49,7 @@ FROM
 LEFT JOIN	
 	projects_technologies AS pt ON p."id" = pt."projectId"
 LEFT JOIN 
-	technologies AS t ON t."id" = pt."technologyId";`;
+	technologies AS t ON pt."technologyId" = t."id";`;
 
   const queryResult: resProjectTechnology = await client.query(queryString);
 
@@ -145,10 +145,82 @@ const deleteProject = async (
   return res.status(204).json();
 };
 
+const insertTechnologyOnProject = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const id: number = +req.params.id;
+  const bodyName = req.body.name;
+
+  const queryStringFindTech: string = `SELECT * FROM technologies WHERE name = $1`;
+  const queryConfigFindTech: QueryConfig = {
+    text: queryStringFindTech,
+    values: [bodyName],
+  };
+  const queryResultFindTech: any = await client.query(queryConfigFindTech);
+
+  const queryStringFindProject: string = `SELECT id FROM projects WHERE id = $1`;
+  const queryConfigFindProject: QueryConfig = {
+    text: queryStringFindProject,
+    values: [id],
+  };
+  const queryResultFindProject: any = await client.query(
+    queryConfigFindProject
+  );
+
+  const foundProject = +queryResultFindProject.rows[0].id;
+  const foundTech = +queryResultFindTech.rows[0].id;
+  const date = new Date();
+
+  const queryStringInsertData: string = `
+    INSERT INTO 
+        projects_technologies ("addedIn", "technologyId", "projectId") 
+    VALUES 
+        ($1, $2, $3)
+    RETURNING *;
+    `;
+
+  const queryConfigInsertData: QueryConfig = {
+    text: queryStringInsertData,
+    values: [date, foundTech, foundProject],
+  };
+
+  await client.query(queryConfigInsertData);
+
+  const queryString = `
+    SELECT
+        t."id" AS "technologyId",
+        t."name" AS "technologyName",
+        p."id" AS "projectId",
+        p."name" AS "projectName",
+        p."description" AS "projectDescription",
+        p."repository" AS "projectRepository",
+        p."startDate" AS "projectStartDate",
+        p."endDate" AS "projectEndDate" 
+    FROM
+        projects AS p
+    LEFT JOIN
+        projects_technologies AS pt ON p."id" = pt."projectId"
+    LEFT JOIN 
+        technologies AS t ON t."id" = pt."technologyId"  
+    WHERE
+        p."id" = $1`;
+
+  const queryConfig: QueryConfig = {
+    text: queryString,
+    values: [id],
+  };
+
+  const queryResult: any = await client.query(queryConfig);
+
+  return res.status(201).json(queryResult.rows[0]);
+};
+
 export {
   createProject,
   getAllProjects,
   getProjectById,
   updateProject,
   deleteProject,
+  insertTechnologyOnProject,
 };

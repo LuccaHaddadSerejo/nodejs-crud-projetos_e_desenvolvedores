@@ -1,5 +1,10 @@
 import * as express from "express";
-import { createdDev, createdDevInfo } from "../types";
+import {
+  createdDev,
+  createdDevInfo,
+  createdProject,
+  resProject,
+} from "../types";
 
 declare global {
   namespace Express {
@@ -11,7 +16,10 @@ declare global {
         handledDevInfo: createdDevInfo;
       };
       project: {
-        handledProjectBody: any;
+        handledProjectBody: resProject;
+      };
+      tech: {
+        handledTechBody: any;
       };
     }
   }

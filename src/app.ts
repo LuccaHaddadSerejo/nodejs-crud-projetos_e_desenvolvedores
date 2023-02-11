@@ -5,6 +5,7 @@ import {
   createDeveloperInfo,
   deleteDeveloper,
   getAllDevelopers,
+  getDeveloperAndProjects,
   getDeveloperByid,
   updateDeveloper,
 } from "./logic/developerLogic";
@@ -14,6 +15,7 @@ import {
   deleteProject,
   getAllProjects,
   getProjectById,
+  insertTechnologyOnProject,
   updateProject,
 } from "../src/logic/projectLogic";
 import {
@@ -38,6 +40,10 @@ import {
   checkProjectRequiredKeysPatch,
   checkProjectInvalidKeysPatch,
 } from "../src/middlewares/projectMiddlewares";
+import {
+  checkIfTechExists,
+  checkTechInvalidKeys,
+} from "../src/middlewares/technologiesMidleware";
 
 const app: Application = express();
 app.use(express.json());
@@ -68,9 +74,23 @@ app.post(
   createProject
 );
 
+app.post(
+  "/projects/:id/technologies",
+  checkIfProjectExists,
+  checkTechInvalidKeys,
+  checkIfTechExists,
+  insertTechnologyOnProject
+);
+
 app.get("/developers", getAllDevelopers);
 
 app.get("/developers/:id", checkIfDeveloperExists, getDeveloperByid);
+
+app.get(
+  "/developers/:id/projects",
+  checkIfDeveloperExists,
+  getDeveloperAndProjects
+);
 
 app.get("/projects", getAllProjects);
 

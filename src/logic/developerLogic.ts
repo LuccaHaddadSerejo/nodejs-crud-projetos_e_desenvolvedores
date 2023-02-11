@@ -124,6 +124,53 @@ const getDeveloperByid = async (
   return res.status(200).json(queryResult.rows[0]);
 };
 
+const getDeveloperAndProjects = async (
+  req: Request,
+  res: Response
+): Promise<Response | void> => {
+  const id: number = +req.params.id;
+
+  const queryString = `
+  SELECT 
+	    d."id" AS "developerId",
+      d."name" AS "developerName",
+      d."email" AS "developerEmail",
+      d."developerInfoID",
+      di."developerSince" AS "developerDeveloperSince",
+      di."preferredOS" AS "developerPreferredOS",
+	    p."id" AS "projectId",
+  	  p."name" AS "projectName",
+  	  p."description" AS "projectDescription",
+  	  p."estimatedTime" AS "projectEstimatedTime",
+  	  p."repository" AS "projectRepository",
+  	  p."startDate" AS "projectStartDate",
+  	  p."endDate" AS "projectEndDate",
+  	  p."developerId" AS "projectDeveloperId",
+	    pt."technologyId",
+	    t."name" AS "technologyName"
+  FROM 
+	    developers AS d
+  LEFT JOIN
+	    developers_info AS di ON di."id" = d."developerInfoID"
+  LEFT JOIN 
+	  projects AS p ON p."developerId" = d."id"
+  LEFT JOIN	
+	  projects_technologies AS pt ON p."id" = pt."projectId"
+  LEFT JOIN 
+	  technologies AS t ON t."id" = pt."technologyId"
+  WHERE p."developerId" = $1;
+  `;
+
+  const queryConfig: QueryConfig = {
+    text: queryString,
+    values: [id],
+  };
+
+  const queryResult: any = await client.query(queryConfig);
+
+  return res.status(200).json(queryResult.rows);
+};
+
 const updateDeveloper = async (
   req: Request,
   res: Response
@@ -182,6 +229,7 @@ export {
   createDeveloperInfo,
   getAllDevelopers,
   getDeveloperByid,
+  getDeveloperAndProjects,
   updateDeveloper,
   deleteDeveloper,
 };
