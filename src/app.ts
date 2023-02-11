@@ -9,7 +9,11 @@ import {
   updateDeveloper,
 } from "./logic/developerLogic";
 import { updateDeveloperInfo } from "../src/logic/developerInfoLogic";
-import { createProject } from "../src/logic/projectLogic";
+import {
+  createProject,
+  getAllProjects,
+  getProjectById,
+} from "../src/logic/projectLogic";
 import {
   checkIfDeveloperExists,
   checkInvalidKeys,
@@ -28,6 +32,7 @@ import {
   checkIfProjectDeveloperExists,
   checkProjectRequiredKeys,
   checkProjectInvalidKeys,
+  checkIfProjectExists,
 } from "../src/middlewares/projectMiddlewares";
 
 const app: Application = express();
@@ -62,6 +67,10 @@ app.post(
 app.get("/developers", getAllDevelopers);
 
 app.get("/developers/:id", checkIfDeveloperExists, getDeveloperByid);
+
+app.get("/projects", getAllProjects);
+
+app.get("/projects/:id", checkIfProjectExists, getProjectById);
 
 app.patch(
   "/developers/:id",

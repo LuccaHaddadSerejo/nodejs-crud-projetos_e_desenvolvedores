@@ -35,6 +35,36 @@ const checkIfProjectDeveloperExists = async (
   }
 };
 
+const checkIfProjectExists = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const id: number = +req.params.id;
+
+  const queryString = `
+	SELECT 
+      *
+  FROM 
+      projects AS p
+  WHERE
+      p."id" = $1
+  `;
+
+  const queryConfig: QueryConfig = {
+    text: queryString,
+    values: [id],
+  };
+
+  const queryResult: any = await client.query(queryConfig);
+
+  if (queryResult.rowCount > 0) {
+    return next();
+  } else {
+    return res.status(404).json({ message: "Project not found" });
+  }
+};
+
 const checkProjectRequiredKeys = async (
   req: Request,
   res: Response,
@@ -95,6 +125,7 @@ const checkProjectInvalidKeys = async (
 
 export {
   checkIfProjectDeveloperExists,
+  checkIfProjectExists,
   checkProjectRequiredKeys,
   checkProjectInvalidKeys,
 };

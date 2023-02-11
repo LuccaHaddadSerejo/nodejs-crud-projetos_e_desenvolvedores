@@ -74,15 +74,18 @@ const getAllDevelopers = async (
   res: Response
 ): Promise<Response> => {
   const queryString = `
-	SELECT
-   		d.*,
-      di."developerSince",
-      di."preferredOS"
-  FROM 
-   		developers AS d 
-  LEFT JOIN
-   		developers_info AS di ON di.id = d."developerInfoID"
-  `;
+  SELECT
+  d."id" AS "developerId",
+  d."name" AS "developerName",
+  d."email" AS "developerEmail",
+  d."developerInfoID",
+  di."developerSince" AS "developerDeveloperSince",
+  di."preferredOS" AS "developerPreferredOS"
+FROM 
+  developers AS d 
+LEFT JOIN
+  developers_info AS di ON di.id = d."developerInfoID";
+`;
 
   const queryResult: resDevWithInfo = await client.query(queryString);
 
@@ -97,9 +100,12 @@ const getDeveloperByid = async (
 
   const queryString = `
   SELECT
-      d.*,
-      di."developerSince",
-      di."preferredOS"
+      d."id" AS "developerId",
+      d."name" AS "developerName",
+      d."email" AS "developerEmail",
+      d."developerInfoID,
+      di."developerSince" AS "developerDeveloperSince",
+      di."preferredOS" AS "developerPreferredOS"
   FROM 
       developers AS d 
   LEFT JOIN
