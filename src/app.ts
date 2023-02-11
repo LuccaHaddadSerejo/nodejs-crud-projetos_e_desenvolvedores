@@ -9,6 +9,7 @@ import {
   updateDeveloper,
 } from "./logic/developerLogic";
 import { updateDeveloperInfo } from "../src/logic/developerInfoLogic";
+import { createProject } from "../src/logic/projectLogic";
 import {
   checkIfDeveloperExists,
   checkInvalidKeys,
@@ -23,6 +24,11 @@ import {
   checkOS,
   checkInfoRequiredKeysPatch,
 } from "../src/middlewares/devInfoMiddleware";
+import {
+  checkIfProjectDeveloperExists,
+  checkProjectRequiredKeys,
+  checkProjectInvalidKeys,
+} from "../src/middlewares/projectMiddlewares";
 
 const app: Application = express();
 app.use(express.json());
@@ -43,6 +49,14 @@ app.post(
   checkUniqueInfo,
   checkOS,
   createDeveloperInfo
+);
+
+app.post(
+  "/projects",
+  checkIfProjectDeveloperExists,
+  checkProjectRequiredKeys,
+  checkProjectInvalidKeys,
+  createProject
 );
 
 app.get("/developers", getAllDevelopers);

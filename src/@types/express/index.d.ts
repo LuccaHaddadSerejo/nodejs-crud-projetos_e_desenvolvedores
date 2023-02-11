@@ -10,6 +10,9 @@ declare global {
       info: {
         handledDevInfo: createdDevInfo;
       };
+      project: {
+        handledProjectBody: any;
+      };
     }
   }
 }
