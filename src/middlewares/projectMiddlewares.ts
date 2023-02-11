@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { QueryConfig } from "pg";
 import { client } from "../database";
-import { resDev } from "../@types/types";
+import { resDev, resProject } from "../@types/types";
 
 const checkIfProjectDeveloperExists = async (
   req: Request,
@@ -56,7 +56,7 @@ const checkIfProjectExists = async (
     values: [id],
   };
 
-  const queryResult: any = await client.query(queryConfig);
+  const queryResult: resProject = await client.query(queryConfig);
 
   if (queryResult.rowCount > 0) {
     return next();
@@ -158,7 +158,7 @@ const checkProjectInvalidKeys = async (
     return body;
   };
 
-  const result: any = deleteKeys(req.body, filterKey);
+  const result: resProject = deleteKeys(req.body, filterKey);
 
   req.project = {
     handledProjectBody: result,
@@ -191,7 +191,7 @@ const checkProjectInvalidKeysPatch = async (
     return body;
   };
 
-  const result: any = deleteKeys(req.body, filterKey);
+  const result: resProject = deleteKeys(req.body, filterKey);
 
   req.project = {
     handledProjectBody: result,

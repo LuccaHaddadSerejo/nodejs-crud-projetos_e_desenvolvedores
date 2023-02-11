@@ -28,6 +28,30 @@ type createdDevInfo = Omit<iDevInfo, "id">;
 type devWithInfo = iDev & iReqDevInfo;
 type resDevWithInfo = QueryResult<devWithInfo>;
 
+interface iReqProject {
+  name?: string | undefined;
+  description?: string | undefined;
+  estimatedTime?: string | undefined;
+  repository?: string | undefined;
+  startDate?: string | undefined;
+  endDate?: string | null | undefined;
+  developerId?: string | undefined;
+}
+
+interface iProject extends iReqProject {
+  id: number;
+}
+
+type createdProject = Omit<iProject, "id">;
+type resProject = QueryResult<iProject>;
+
+interface iProjectTechnology extends iProject {
+  technologyId: number | null;
+  technologyName: string | null;
+}
+
+type resProjectTechnology = QueryResult<iProjectTechnology>;
+
 export {
   iReqDev,
   iDev,
@@ -38,4 +62,10 @@ export {
   createdDevInfo,
   devWithInfo,
   resDevWithInfo,
+  iReqProject,
+  iProject,
+  createdProject,
+  resProject,
+  iProjectTechnology,
+  resProjectTechnology,
 };

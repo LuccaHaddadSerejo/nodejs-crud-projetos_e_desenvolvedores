@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { QueryConfig } from "pg";
 import format from "pg-format";
+import { resProject, resProjectTechnology } from "../@types/types";
 import { client } from "../database";
 
 const createProject = async (
@@ -22,7 +23,7 @@ const createProject = async (
     dataValues
   );
 
-  const queryResult: any = await client.query(queryString);
+  const queryResult: resProject = await client.query(queryString);
 
   return res.status(201).json(queryResult.rows[0]);
 };
@@ -50,7 +51,7 @@ LEFT JOIN
 LEFT JOIN 
 	technologies AS t ON t."id" = pt."technologyId";`;
 
-  const queryResult: any = await client.query(queryString);
+  const queryResult: resProjectTechnology = await client.query(queryString);
 
   return res.status(200).json(queryResult.rows);
 };
@@ -86,7 +87,7 @@ LEFT JOIN
     values: [id],
   };
 
-  const queryResult: any = await client.query(queryConfig);
+  const queryResult: resProjectTechnology = await client.query(queryConfig);
 
   return res.status(200).json(queryResult.rows[0]);
 };
@@ -95,7 +96,7 @@ const updateProject = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const id = req.params.id;
+  const id: number = +req.params.id;
   const dataKeys = Object.keys(req.project.handledProjectBody);
   const dataValues = Object.values(req.project.handledProjectBody);
   const queryString: string = format(
@@ -117,7 +118,7 @@ const updateProject = async (
     values: [id],
   };
 
-  const queryResult: any = await client.query(queryConfig);
+  const queryResult: resProject = await client.query(queryConfig);
 
   return res.status(200).json(queryResult.rows[0]);
 };
