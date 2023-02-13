@@ -42,4 +42,4 @@ CREATE TABLE IF NOT EXISTS technologies(
 );
 
 INSERT INTO technologies ("name")
-VALUES ('Javascript'), ('Python'), ('React'), ('HTML') , ('CSS'), ('MongoDB'), ('PostgreSQL'), ('Express.js'), ('Django')
+VALUES ('JavaScript'), ('Python'), ('React'), ('HTML') , ('CSS'), ('MongoDB'), ('PostgreSQL'), ('Express.js'), ('Django')
