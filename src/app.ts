@@ -13,6 +13,7 @@ import { updateDeveloperInfo } from "../src/logic/developerInfoLogic";
 import {
   createProject,
   deleteProject,
+  deleteTechFromProject,
   getAllProjects,
   getProjectById,
   insertTechnologyOnProject,
@@ -125,6 +126,8 @@ app.patch(
 app.delete("/developers/:id", checkIfDeveloperExists, deleteDeveloper);
 
 app.delete("/projects/:id", checkIfProjectExists, deleteProject);
+
+app.delete("/projects/:id/technologies/:name", deleteTechFromProject);
 
 app.listen(3000, async () => {
   console.log("Server is running!");

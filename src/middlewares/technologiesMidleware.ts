@@ -45,9 +45,8 @@ const checkIfTechExists = async (
   ];
 
   const checkValue: boolean = requiredValues.some((value: string) =>
-    requiredValues.includes(value)
+    values.includes(value)
   );
-  console.log(checkValue);
 
   if (checkValue) {
     return next();
@@ -55,7 +54,7 @@ const checkIfTechExists = async (
     return res.status(404).json({
       message: "Technology not supported.",
       options: [
-        "JavaScript",
+        "Javascript",
         "Python",
         "React",
         "Express.js",

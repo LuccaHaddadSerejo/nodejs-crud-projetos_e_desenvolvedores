@@ -3,7 +3,7 @@ CREATE TYPE osoption AS ENUM ('Windows', 'Linux', 'MacOS');
 CREATE TABLE IF NOT EXISTS developers_info(
 	"id" SERIAL PRIMARY KEY,
 	"developerSince" DATE NOT NULL,
-	"preferredOS" osoption NOT NULL,
+	"preferredOS" osoption NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS developers(
@@ -40,3 +40,6 @@ CREATE TABLE IF NOT EXISTS technologies(
 	FOREIGN KEY ("projectId") REFERENCES projects(id),
 	FOREIGN KEY ("technologyId") REFERENCES technologies(id)
 );
+
+INSERT INTO technologies ("name")
+VALUES ('Javascript'), ('Python'), ('React'), ('HTML') , ('CSS'), ('MongoDB'), ('PostgreSQL'), ('Express.js'), ('Django')

@@ -150,7 +150,7 @@ const insertTechnologyOnProject = async (
   res: Response
 ): Promise<Response> => {
   const id: number = +req.params.id;
-  const bodyName = req.body.name;
+  const bodyName: string = req.tech.handledTechBody.name;
 
   const queryStringFindTech: string = `SELECT * FROM technologies WHERE name = $1`;
   const queryConfigFindTech: QueryConfig = {
@@ -213,7 +213,48 @@ const insertTechnologyOnProject = async (
 
   const queryResult: any = await client.query(queryConfig);
 
-  return res.status(201).json(queryResult.rows[0]);
+  return res.status(201).json(queryResult.rows);
+};
+
+const deleteTechFromProject = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const projectId: number = +req.params.id;
+  const techName: any = req.params.name;
+
+  const queryStringFindTech: string = `
+  SELECT 
+      * 
+  FROM 
+      technologies 
+  WHERE 
+      "name" = $1`;
+
+  const queryConfigFindTech: QueryConfig = {
+    text: queryStringFindTech,
+    values: [techName],
+  };
+
+  const queryResultFindTech: any = await client.query(queryConfigFindTech);
+  const foundTechId = +queryResultFindTech.rows[0].id;
+
+  const queryString = `
+  DELETE FROM 
+      projects_technologies 
+  WHERE 
+      "technologyId" = $1  
+  AND 
+      "projectId" = $2;`;
+
+  const queryConfig: QueryConfig = {
+    text: queryString,
+    values: [foundTechId, projectId],
+  };
+
+  await client.query(queryConfig);
+
+  return res.status(204).json();
 };
 
 export {
@@ -223,4 +264,5 @@ export {
   updateProject,
   deleteProject,
   insertTechnologyOnProject,
+  deleteTechFromProject,
 };

@@ -89,21 +89,21 @@ LEFT JOIN
 
   const queryResult: resDevWithInfo = await client.query(queryString);
 
-  return res.status(200).json(queryResult.rows);
+  return res.status(200).json(queryResult.rows.reverse());
 };
 
 const getDeveloperByid = async (
   req: Request,
   res: Response
 ): Promise<Response | void> => {
-  const id = req.params.id;
+  const id: number = +req.params.id;
 
   const queryString = `
   SELECT
       d."id" AS "developerId",
       d."name" AS "developerName",
       d."email" AS "developerEmail",
-      d."developerInfoID,
+      d."developerInfoID",
       di."developerSince" AS "developerDeveloperSince",
       di."preferredOS" AS "developerPreferredOS"
   FROM 
