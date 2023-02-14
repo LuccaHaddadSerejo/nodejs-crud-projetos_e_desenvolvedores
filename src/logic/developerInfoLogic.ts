@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { QueryConfig } from "pg";
 import format from "pg-format";
 import { client } from "../database";
-import { resDevInfo } from "../@types/types";
+import { resDevInfo } from "../@types/developerTypes";
 
 const updateDeveloperInfo = async (
   req: Request,

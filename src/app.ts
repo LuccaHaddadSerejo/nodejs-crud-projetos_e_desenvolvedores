@@ -25,14 +25,14 @@ import {
   checkRequiredKeys,
   checkRequiredKeysPatch,
   checkUniqueEmail,
-} from "../src/middlewares/developerMiddleware";
+} from "./middlewares/developerMiddlewares";
 import {
   checkInfoInvalidKeys,
   checkInfoRequiredKeys,
   checkUniqueInfo,
   checkOS,
   checkInfoRequiredKeysPatch,
-} from "../src/middlewares/devInfoMiddleware";
+} from "./middlewares/devInfoMiddlewares";
 import {
   checkIfProjectDeveloperExists,
   checkProjectRequiredKeys,
@@ -42,9 +42,11 @@ import {
   checkProjectInvalidKeysPatch,
 } from "../src/middlewares/projectMiddlewares";
 import {
+  checkIfParamTechExists,
   checkIfTechExists,
+  checkIfTechExistsInProject,
   checkTechInvalidKeys,
-} from "../src/middlewares/technologiesMidleware";
+} from "./middlewares/technologiesMidlewares";
 
 const app: Application = express();
 app.use(express.json());
@@ -127,7 +129,14 @@ app.delete("/developers/:id", checkIfDeveloperExists, deleteDeveloper);
 
 app.delete("/projects/:id", checkIfProjectExists, deleteProject);
 
-app.delete("/projects/:id/technologies/:name", deleteTechFromProject);
+app.delete(
+  "/projects/:id/technologies/:name",
+  checkIfProjectExists,
+  checkTechInvalidKeys,
+  checkIfParamTechExists,
+  checkIfTechExistsInProject,
+  deleteTechFromProject
+);
 
 app.listen(3000, async () => {
   console.log("Server is running!");

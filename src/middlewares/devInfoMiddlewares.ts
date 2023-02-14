@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { createdDevInfo, resDev } from "../@types/types";
+import { createdDevInfo, resDev } from "../@types/developerTypes";
 import { QueryConfig } from "pg";
 import { client } from "../database";
 

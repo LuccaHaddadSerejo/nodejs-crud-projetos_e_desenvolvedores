@@ -3,8 +3,8 @@ import {
   createdDev,
   createdDevInfo,
   createdProject,
-  resProject,
-} from "../types";
+  iReqTech,
+} from "../developerTypes";
 
 declare global {
   namespace Express {
@@ -16,10 +16,10 @@ declare global {
         handledDevInfo: createdDevInfo;
       };
       project: {
-        handledProjectBody: resProject;
+        handledProjectBody: createdProject;
       };
       tech: {
-        handledTechBody: any;
+        handledTechBody: iReqTech;
       };
     }
   }
