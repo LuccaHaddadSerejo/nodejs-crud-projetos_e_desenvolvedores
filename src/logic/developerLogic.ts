@@ -2,7 +2,12 @@ import { Request, Response } from "express";
 import { QueryConfig } from "pg";
 import format from "pg-format";
 import { client } from "../database";
-import { resDev, resDevInfo, resDevWithInfo } from "../@types/types";
+import {
+  resDev,
+  resDevInfo,
+  resDevProjectAndTech,
+  resDevWithInfo,
+} from "../@types/developerTypes";
 
 const createDeveloper = async (
   req: Request,
@@ -166,7 +171,7 @@ const getDeveloperAndProjects = async (
     values: [id],
   };
 
-  const queryResult: any = await client.query(queryConfig);
+  const queryResult: resDevProjectAndTech = await client.query(queryConfig);
 
   return res.status(200).json(queryResult.rows);
 };

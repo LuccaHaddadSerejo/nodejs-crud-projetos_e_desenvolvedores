@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import { QueryConfig } from "pg";
 import format from "pg-format";
-import { resProject, resProjectTechnology } from "../@types/types";
+import { resDevProjectAndTech } from "../@types/developerTypes";
+import { resProject, resProjectTechnology } from "../@types/projectsTypes";
+import { resTech } from "../@types/techTypes";
 import { client } from "../database";
 
 const createProject = async (
@@ -151,25 +153,29 @@ const insertTechnologyOnProject = async (
 ): Promise<Response> => {
   const id: number = +req.params.id;
   const bodyName: string = req.tech.handledTechBody.name;
+  const formatFirstLetter: string = bodyName[0].toUpperCase();
+  const sliceName: string = bodyName.slice(1);
+  const formatedName: string = formatFirstLetter.concat(sliceName);
 
   const queryStringFindTech: string = `SELECT * FROM technologies WHERE name = $1`;
   const queryConfigFindTech: QueryConfig = {
     text: queryStringFindTech,
-    values: [bodyName],
+    values: [formatedName],
   };
-  const queryResultFindTech: any = await client.query(queryConfigFindTech);
+  const queryResultFindTech: resTech = await client.query(queryConfigFindTech);
 
   const queryStringFindProject: string = `SELECT id FROM projects WHERE id = $1`;
   const queryConfigFindProject: QueryConfig = {
     text: queryStringFindProject,
     values: [id],
   };
-  const queryResultFindProject: any = await client.query(
+  const queryResultFindProject: resProject = await client.query(
     queryConfigFindProject
   );
 
   const foundProject = +queryResultFindProject.rows[0].id;
   const foundTech = +queryResultFindTech.rows[0].id;
+
   const date = new Date();
 
   const queryStringInsertData: string = `
@@ -211,7 +217,7 @@ const insertTechnologyOnProject = async (
     values: [id],
   };
 
-  const queryResult: any = await client.query(queryConfig);
+  const queryResult: resDevProjectAndTech = await client.query(queryConfig);
 
   return res.status(201).json(queryResult.rows);
 };
@@ -221,7 +227,10 @@ const deleteTechFromProject = async (
   res: Response
 ): Promise<Response> => {
   const projectId: number = +req.params.id;
-  const techName: any = req.params.name;
+  const techName: string = req.params.name;
+  const formatFirstLetter: string = techName[0].toUpperCase();
+  const sliceName: string = techName.slice(1);
+  const formatedName: string = formatFirstLetter.concat(sliceName);
 
   const queryStringFindTech: string = `
   SELECT 
@@ -233,10 +242,10 @@ const deleteTechFromProject = async (
 
   const queryConfigFindTech: QueryConfig = {
     text: queryStringFindTech,
-    values: [techName],
+    values: [formatedName],
   };
 
-  const queryResultFindTech: any = await client.query(queryConfigFindTech);
+  const queryResultFindTech: resTech = await client.query(queryConfigFindTech);
   const foundTechId = +queryResultFindTech.rows[0].id;
 
   const queryString = `

@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { QueryConfig } from "pg";
 import { client } from "../database";
-import { resDev, resProject } from "../@types/types";
+import { resDev } from "../@types/developerTypes";
+import { iReqProject, resProject } from "../@types/projectsTypes";
 
 const checkIfProjectDeveloperExists = async (
   req: Request,
@@ -153,12 +154,12 @@ const checkProjectInvalidKeys = async (
     (key: string) => requiredKeys.includes(key) === false
   );
 
-  const deleteKeys = (body: any, unwantedKeys: string[]): any => {
+  const deleteKeys = (body: any, unwantedKeys: string[]): iReqProject => {
     unwantedKeys.map((key: string) => delete body[key]);
     return body;
   };
 
-  const result: resProject = deleteKeys(req.body, filterKey);
+  const result: iReqProject = deleteKeys(req.body, filterKey);
 
   req.project = {
     handledProjectBody: result,
@@ -186,12 +187,12 @@ const checkProjectInvalidKeysPatch = async (
     (key: string) => requiredKeys.includes(key) === false
   );
 
-  const deleteKeys = (body: any, unwantedKeys: string[]): any => {
+  const deleteKeys = (body: any, unwantedKeys: string[]): iReqProject => {
     unwantedKeys.map((key: string) => delete body[key]);
     return body;
   };
 
-  const result: resProject = deleteKeys(req.body, filterKey);
+  const result: iReqProject = deleteKeys(req.body, filterKey);
 
   req.project = {
     handledProjectBody: result,
