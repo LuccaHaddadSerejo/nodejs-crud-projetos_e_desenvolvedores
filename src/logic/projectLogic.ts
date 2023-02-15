@@ -10,24 +10,33 @@ const createProject = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const dataKeys = Object.keys(req.project.handledProjectBody);
-  const dataValues = Object.values(req.project.handledProjectBody);
+  try {
+    const dataKeys = Object.keys(req.project.handledProjectBody);
+    const dataValues = Object.values(req.project.handledProjectBody);
 
-  const queryString: string = format(
-    `
+    const queryString: string = format(
+      `
     INSERT INTO 
         projects (%I)
     VALUES 
         (%L)
     RETURNING *;
     `,
-    dataKeys,
-    dataValues
-  );
+      dataKeys,
+      dataValues
+    );
 
-  const queryResult: resProject = await client.query(queryString);
+    const queryResult: resProject = await client.query(queryString);
 
-  return res.status(201).json(queryResult.rows[0]);
+    return res.status(201).json(queryResult.rows[0]);
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(400).json({ message: error.message });
+    } else {
+      console.error(error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  }
 };
 
 const getAllProjects = async (
