@@ -153,14 +153,11 @@ const insertTechnologyOnProject = async (
 ): Promise<Response> => {
   const id: number = +req.params.id;
   const bodyName: string = req.tech.handledTechBody.name;
-  const formatFirstLetter: string = bodyName[0].toUpperCase();
-  const sliceName: string = bodyName.slice(1);
-  const formatedName: string = formatFirstLetter.concat(sliceName);
 
   const queryStringFindTech: string = `SELECT * FROM technologies WHERE name = $1`;
   const queryConfigFindTech: QueryConfig = {
     text: queryStringFindTech,
-    values: [formatedName],
+    values: [bodyName],
   };
   const queryResultFindTech: resTech = await client.query(queryConfigFindTech);
 
@@ -228,9 +225,6 @@ const deleteTechFromProject = async (
 ): Promise<Response> => {
   const projectId: number = +req.params.id;
   const techName: string = req.params.name;
-  const formatFirstLetter: string = techName[0].toUpperCase();
-  const sliceName: string = techName.slice(1);
-  const formatedName: string = formatFirstLetter.concat(sliceName);
 
   const queryStringFindTech: string = `
   SELECT 
@@ -242,7 +236,7 @@ const deleteTechFromProject = async (
 
   const queryConfigFindTech: QueryConfig = {
     text: queryStringFindTech,
-    values: [formatedName],
+    values: [techName],
   };
 
   const queryResultFindTech: resTech = await client.query(queryConfigFindTech);
