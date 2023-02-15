@@ -100,7 +100,7 @@ LEFT JOIN
 
   const queryResult: resProjectTechnology = await client.query(queryConfig);
 
-  return res.status(200).json(queryResult.rows[0]);
+  return res.status(200).json(queryResult.rows);
 };
 
 const updateProject = async (
@@ -224,8 +224,7 @@ const insertTechnologyOnProject = async (
   };
 
   const queryResult: resDevProjectAndTech = await client.query(queryConfig);
-
-  return res.status(201).json(queryResult.rows);
+  return res.status(201).json(queryResult.rows.at(-1));
 };
 
 const deleteTechFromProject = async (
