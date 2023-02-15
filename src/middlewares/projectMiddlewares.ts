@@ -9,7 +9,7 @@ const checkIfProjectDeveloperExists = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const id = req.body.developerId;
+  const id: number = +req.body.developerId;
 
   const queryString = `
   SELECT
