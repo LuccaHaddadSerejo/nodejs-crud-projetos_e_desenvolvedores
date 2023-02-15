@@ -105,8 +105,8 @@ const checkOS = async (
   next: NextFunction
 ): Promise<Response | void> => {
   const data = req.info.handledDevInfo;
-  const OsOptions = ["Windows", "Linux", "MacOS"];
-  const checkOsData = OsOptions.includes(data.preferredOS!);
+  const osOptions = ["Windows", "Linux", "MacOS"];
+  const checkOsData = osOptions.includes(data.preferredOS!);
 
   if (checkOsData) {
     return next();

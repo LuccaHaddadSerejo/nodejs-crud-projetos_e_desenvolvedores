@@ -180,7 +180,7 @@ const updateDeveloper = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const id = req.params.id;
+  const id: number = +req.params.id;
   const dataKeys = Object.keys(req.developer.handledBody);
   const dataValues = Object.values(req.developer.handledBody);
   const queryString: string = format(
@@ -211,7 +211,7 @@ const deleteDeveloper = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const id = req.params.id;
+  const id: number = +req.params.id;
   const queryString = `
   DELETE FROM 
       developers 

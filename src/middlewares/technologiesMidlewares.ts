@@ -36,34 +36,30 @@ const checkIfTechExists = async (
   next: NextFunction
 ): Promise<Response | void> => {
   const values = Object.values(req.tech.handledTechBody);
-  const transformValues = values.map((value: any) => value.toLowerCase());
 
   const requiredValues = [
+    "JavaScript",
     "Python",
-    "Javascript",
-    "MongoDB",
-    "PostgreSQL",
-    "HTML",
-    "CSS",
-    "HTML",
     "React",
     "Express.js",
+    "HTML",
+    "CSS",
+    "Django",
+    "PostgreSQL",
+    "MongoDB",
   ];
-  const transformRequiredValues = requiredValues.map((value: string) =>
-    value.toLowerCase()
+
+  const checkValue: boolean = requiredValues.some((value: string) =>
+    values.includes(value)
   );
 
-  const checkValue: string | undefined = transformRequiredValues.find(
-    (value: string) => value === transformValues[0]
-  );
-
-  if (checkValue!.length > 0) {
+  if (checkValue) {
     return next();
   } else {
     return res.status(404).json({
       message: "Technology not supported",
       options: [
-        "Javascript",
+        "JavaScript",
         "Python",
         "React",
         "Express.js",
@@ -82,35 +78,31 @@ const checkIfParamTechExists = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const value: string = req.params.name;
-  const transformValue = value.toLowerCase();
+  const paramName: string = req.params.name;
 
   const requiredValues = [
+    "JavaScript",
     "Python",
-    "Javascript",
-    "MongoDB",
-    "PostgreSQL",
-    "HTML",
-    "CSS",
-    "HTML",
     "React",
     "Express.js",
+    "HTML",
+    "CSS",
+    "Django",
+    "PostgreSQL",
+    "MongoDB",
   ];
-  const transformRequiredValues = requiredValues.map((value: string) =>
-    value.toLowerCase()
+
+  const checkValue: boolean = requiredValues.some(
+    (value: string) => paramName === value
   );
 
-  const checkValue: string | undefined = transformRequiredValues.find(
-    (value: string) => value === transformValue
-  );
-
-  if (checkValue!.length > 0) {
+  if (checkValue) {
     return next();
   } else {
     return res.status(404).json({
       message: "Technology not supported",
       options: [
-        "Javascript",
+        "JavaScript",
         "Python",
         "React",
         "Express.js",
@@ -131,9 +123,6 @@ const checkIfTechExistsInProject = async (
 ): Promise<Response | void> => {
   const projectId: number = +req.params.id;
   const techName: string = req.params.name;
-  const formatFirstLetter: string = techName[0].toUpperCase();
-  const sliceName: string = techName.slice(1);
-  const formatedName: string = formatFirstLetter.concat(sliceName);
 
   const queryStringFindTech: string = `
   SELECT 
@@ -145,7 +134,7 @@ const checkIfTechExistsInProject = async (
 
   const queryConfigFindTech: QueryConfig = {
     text: queryStringFindTech,
-    values: [formatedName],
+    values: [techName],
   };
 
   const queryResultFindTech: resTech = await client.query(queryConfigFindTech);

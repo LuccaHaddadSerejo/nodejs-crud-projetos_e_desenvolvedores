@@ -10,24 +10,33 @@ const createProject = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const dataKeys = Object.keys(req.project.handledProjectBody);
-  const dataValues = Object.values(req.project.handledProjectBody);
+  try {
+    const dataKeys = Object.keys(req.project.handledProjectBody);
+    const dataValues = Object.values(req.project.handledProjectBody);
 
-  const queryString: string = format(
-    `
+    const queryString: string = format(
+      `
     INSERT INTO 
         projects (%I)
     VALUES 
         (%L)
     RETURNING *;
     `,
-    dataKeys,
-    dataValues
-  );
+      dataKeys,
+      dataValues
+    );
 
-  const queryResult: resProject = await client.query(queryString);
+    const queryResult: resProject = await client.query(queryString);
 
-  return res.status(201).json(queryResult.rows[0]);
+    return res.status(201).json(queryResult.rows[0]);
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(400).json({ message: error.message });
+    } else {
+      console.error(error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  }
 };
 
 const getAllProjects = async (
@@ -153,14 +162,11 @@ const insertTechnologyOnProject = async (
 ): Promise<Response> => {
   const id: number = +req.params.id;
   const bodyName: string = req.tech.handledTechBody.name;
-  const formatFirstLetter: string = bodyName[0].toUpperCase();
-  const sliceName: string = bodyName.slice(1);
-  const formatedName: string = formatFirstLetter.concat(sliceName);
 
   const queryStringFindTech: string = `SELECT * FROM technologies WHERE name = $1`;
   const queryConfigFindTech: QueryConfig = {
     text: queryStringFindTech,
-    values: [formatedName],
+    values: [bodyName],
   };
   const queryResultFindTech: resTech = await client.query(queryConfigFindTech);
 
@@ -228,9 +234,6 @@ const deleteTechFromProject = async (
 ): Promise<Response> => {
   const projectId: number = +req.params.id;
   const techName: string = req.params.name;
-  const formatFirstLetter: string = techName[0].toUpperCase();
-  const sliceName: string = techName.slice(1);
-  const formatedName: string = formatFirstLetter.concat(sliceName);
 
   const queryStringFindTech: string = `
   SELECT 
@@ -242,7 +245,7 @@ const deleteTechFromProject = async (
 
   const queryConfigFindTech: QueryConfig = {
     text: queryStringFindTech,
-    values: [formatedName],
+    values: [techName],
   };
 
   const queryResultFindTech: resTech = await client.query(queryConfigFindTech);

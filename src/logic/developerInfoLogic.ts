@@ -2,13 +2,13 @@ import { Request, Response } from "express";
 import { QueryConfig } from "pg";
 import format from "pg-format";
 import { client } from "../database";
-import { resDevInfo } from "../@types/developerTypes";
+import { resDev, resDevInfo } from "../@types/developerTypes";
 
 const updateDeveloperInfo = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const id = req.params.id;
+  const id: number = +req.params.id;
   const dataKeys = Object.keys(req.info.handledDevInfo);
   const dataValues = Object.values(req.info.handledDevInfo);
 
@@ -25,11 +25,11 @@ const updateDeveloperInfo = async (
     values: [id],
   };
 
-  const queryResultFindDev = await client.query(queryConfigFindDev);
+  const queryResultFindDev: resDev = await client.query(queryConfigFindDev);
 
   const foundDev = queryResultFindDev.rows[0];
 
-  const infoID: number = +foundDev.developerInfoID;
+  const infoID: number = +!foundDev.developerInfoID;
 
   const queryString: string = format(
     `
@@ -50,7 +50,6 @@ const updateDeveloperInfo = async (
   };
 
   const queryResult: resDevInfo = await client.query(queryConfig);
-  console.log(queryResult.rows[0]);
 
   return res.status(200).json(queryResult.rows[0]);
 };

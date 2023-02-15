@@ -8,7 +8,7 @@ const checkIfDeveloperExists = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const id = +req.params.id;
+  const id: number = +req.params.id;
 
   const queryString = `
   SELECT
