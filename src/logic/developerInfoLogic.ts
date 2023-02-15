@@ -29,7 +29,7 @@ const updateDeveloperInfo = async (
 
   const foundDev = queryResultFindDev.rows[0];
 
-  const infoID: number = +!foundDev.developerInfoID;
+  const infoID = foundDev.developerInfoID;
 
   const queryString: string = format(
     `
